@@ -3,117 +3,105 @@ import { useState, useEffect } from "react";
 
 import Header from "@/components/Header";
 import AddTask from "@components/AddTask";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Spinner } from "@chakra-ui/react";
 import { ITask } from "@types";
 import NoTask from "@components/NoTask";
 import Task from "@components/Task";
 import Loading from "@components/Loading";
 
 export default function Home() {
+
   const [task, setTask] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [allTasks, setAllTasks] = useState([])
 
   const handleCreateTask = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const response = await fetch("/api/task/new", {
         method: 'POST',
-        body: JSON.stringify({ task: task }),
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      });
+        body: JSON.stringify({
+          task: task
+        })
+      })
       if (response.ok) {
-        setTask('');
-        fetchTasks();
+        setTask('')
+        fetchTasks()
       } else {
-        console.log('Error creating task');
+        console.log('error')
       }
-    } catch (error) {
-      console.log('Error:', error);
     }
-    setIsLoading(false);
+    catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false)
   }
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch("/api/task/all", {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch tasks');
-      }
-      const data = await response.json();
-      setAllTasks(data);
-      setIsLoading(false);
+      const response = await fetch("/api/task/all")
+      const data = await response.json()
+      setAllTasks(data)
+      setIsLoading(false)
     } catch (error) {
-      console.log("Error fetching tasks:", error);
-      setIsLoading(false);
+      console.log(error);
     }
   }
 
   const handleCompleteTask = async(id: string) => {
     try {
       const response = await fetch(`/api/task/complete/${id}`, {
-        method: "PATCH",
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      });
+        method: "PATCH"
+      })
       if(response.ok){
-        await fetchTasks();  // Recharger les tâches après la mise à jour
+        await fetchTasks()
       } else {
-        console.log("Error completing task");
+        console.log("error completing task")
       }
     } catch (error) {
-      console.log("Error completing task:", error);
+      console.log("Error complete task", error);
     }
   }
 
   const handleDeleteTask = async(id: string) => {
     try {
       const response = await fetch(`/api/task/delete/${id}`, {
-        method: "DELETE",
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      });
+        method: "DELETE"
+      })
       if(response.ok) {
-        setAllTasks((prevTasks) => prevTasks.filter((task: ITask) => task._id !== id));
+        setAllTasks((prevTasks) => prevTasks.filter((task: ITask) => task._id !== id))
       } else {
-        console.log("Error deleting task");
+        console.log("error");
       }
     } catch (error) {
-      console.log("Error deleting task:", error);
+      console.log(error);
     }
   }
 
   useEffect(() => {
-    fetchTasks();  // Charger les tâches au montage du composant
-  }, []);
+    fetchTasks()
+  }, [])
 
   return (
     <>
       <Header />
-      <AddTask task={task} setTask={setTask} handleCreateTask={handleCreateTask} />
+      <AddTask task={task} setTask={setTask} handleCreateTask=
+        {handleCreateTask} />
       {isLoading ? (
-        <Loading />
-      ) : (
-        <Flex direction="column" p="2rem">
-          {allTasks.length > 0 ? (
-            allTasks.map((individualTask: ITask) => (
-              <Task key={individualTask._id}  individualTask={individualTask} handleCompleteTask={handleCompleteTask} handleDeleteTask={handleDeleteTask}/>
-            ))
-          ) : (
-            <NoTask />
-          )}
-        </Flex>
-      )}
+  <Loading />
+) : (
+  <>
+    <Flex direction="column" p="2rem">
+      {allTasks.length > 0 ?
+        allTasks.map((individualTask: ITask) => (
+          <Task key={individualTask._id}  individualTask={individualTask} handleCompleteTask={handleCompleteTask} handleDeleteTask={handleDeleteTask}/>
+        )) : (
+          <NoTask />
+        )
+      }
+    </Flex>
+  </>
+)}
     </>
   );
 }
