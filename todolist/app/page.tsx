@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 
 import Header from "@/components/Header";
 import AddTask from "@components/AddTask";
-import { set } from "mongoose";
 import { Flex, Spinner } from "@chakra-ui/react";
 import { ITask } from "@types";
 import NoTask from "@components/NoTask";
 import Task from "@components/Task";
 import Loading from "@components/Loading";
+
+import { unstable_noStore as noStore } from "next/cache";
 
 export default function Home() {
 
@@ -17,6 +18,7 @@ export default function Home() {
   const [allTasks, setAllTasks] = useState([])
 
   const handleCreateTask = async () => {
+    noStore()
     setIsLoading(true)
     try {
       const response = await fetch("/api/task/new", {
@@ -39,6 +41,7 @@ export default function Home() {
   }
 
   const fetchTasks = async () => {
+    noStore()
     try {
       const response = await fetch("/api/task/all")
       const data = await response.json()
@@ -50,6 +53,7 @@ export default function Home() {
   }
 
   const handleCompleteTask = async(id: string) => {
+    noStore()
     try {
       const response = await fetch(`/api/task/complete/${id}`, {
         method: "PATCH"
@@ -65,6 +69,7 @@ export default function Home() {
   }
 
   const handleDeleteTask = async(id: string) => {
+    noStore()
     try {
       const response = await fetch(`/api/task/delete/${id}`, {
         method: "DELETE"
