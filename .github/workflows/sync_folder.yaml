@@ -3,7 +3,7 @@ name: Sync Dossier Todolist vers repo hebergé
 on:
   push:
     branches:
-      - main  # Déclenche le workflow sur chaque push vers la branche principale
+      - master
 
 jobs:
   sync:
