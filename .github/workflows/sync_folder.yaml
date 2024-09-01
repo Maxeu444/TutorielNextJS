@@ -1,0 +1,38 @@
+name: Sync Dossier Todolist vers repo hebergé
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le workflow sur chaque push vers la branche principale
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source repository
+      uses: actions/checkout@v3
+      with:
+        repository: Maxeu444/TutorielNextJS
+        token: ${{ secrets.GITHUB_TOKEN }}
+        path: source-repo
+
+    - name: Checkout target repository
+      uses: actions/checkout@v3
+      with:
+        repository: Maxeu444/todolistio
+        token: ${{ secrets.TARGET_REPO_TOKEN }}
+        path: target-repo
+
+    - name: Sync folder contents
+      run: |
+        # Copier le contenu du dossier 'todolist' du dépôt source vers le dépôt cible
+        rsync -av --delete source-repo/todolist/ target-repo/todolist/
+
+        # Se déplacer dans le dépôt cible pour commit les changements
+        cd target-repo
+
+        # Ajouter les modifications, commit et push
+        git add todolist/
+        git commit -m "Sync todolist folder from source repo"
+        git push origin main

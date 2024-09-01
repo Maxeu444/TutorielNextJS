@@ -21,3 +21,8 @@ export interface IDeleteTaskRequestParam {
         id: string
     }
 }
+
+export interface IUser extends Document {
+    email: string;
+    password: string;
+}
